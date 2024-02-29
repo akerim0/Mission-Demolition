@@ -10,7 +10,8 @@ public class ProjectileScript : MonoBehaviour
 
     [SerializeField]
     private bool _awake = true;
-    
+
+    //GameMode mode;
     public bool awake
     {
         get { return _awake; }
@@ -30,6 +31,7 @@ public class ProjectileScript : MonoBehaviour
         deltas.Add(1000);
         projectiles.Add(this);
     }
+   
     private void FixedUpdate()
     {
         if (rigid.isKinematic || !awake) return;
@@ -53,6 +55,10 @@ public class ProjectileScript : MonoBehaviour
             awake = false ;
             rigid.Sleep();
         }
+        if ((MissionDemolition.Projectiles.Count < 1) && !GoalScript.goalMet && rigid.IsSleeping())
+        {
+            MissionDemolition.mode = GameMode.gameOver;
+        }
     }
     private void OnDestroy()
     {
@@ -65,4 +71,5 @@ public class ProjectileScript : MonoBehaviour
             Destroy(p.gameObject);
         }
     }
+    
 }

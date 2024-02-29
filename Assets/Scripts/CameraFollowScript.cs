@@ -13,11 +13,17 @@ public class CameraFollowScript : MonoBehaviour
     [Header("Inscribed")]
     public float easing = 0.05f;
     public Vector2 minXY = Vector2.zero;
+    public float transitionTime = 1.5f;
     public GameObject viewBothGo;
+    
 
     [Header("Dynamic")]
     public float camZ;
     public eView nextView = eView.slingshot;
+    public float lastShotTime;
+    public GameObject slingshot;
+
+    bool OnSwithView = false;
 
     private void Awake()
     {
@@ -49,6 +55,15 @@ public class CameraFollowScript : MonoBehaviour
         
         transform.position = destination;
         Camera.main.orthographicSize = destination.y + 10;
+        if (pointOfInt == null)
+            StartCoroutine(waitToTransit());
+        
+    }
+    IEnumerator waitToTransit()
+    {
+        yield return new WaitForSeconds(transitionTime);
+        Debug.Log(" yop yonjnb");
+        pointOfInt = viewBothGo;
     }
 
     public void SwitchView(eView newView)
@@ -60,7 +75,8 @@ public class CameraFollowScript : MonoBehaviour
         switch (newView)
         {
             case eView.slingshot:
-                pointOfInt = null;
+                pointOfInt = slingshot;
+                pointOfInt.transform.position = Vector3.zero;
                 nextView = eView.castle;
                 break;
             case eView.castle:

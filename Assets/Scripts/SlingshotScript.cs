@@ -5,20 +5,23 @@ using UnityEngine;
 public class SlingshotScript : MonoBehaviour
 {
     [Header("Inscribed")]
-    public GameObject projectilePrefab;
+    //public GameObject projectilePrefab;
     public float velocity = 10f;
     public GameObject projLinePrefab;
+    public GameObject launchPoint;
 
     [Header("Dynamic")]
     public Vector3 launchPos;
     public GameObject projectile;
     public bool aimingMode;
-    public GameObject launchPoint;
+    public GameObject[] Projectiles;
+    bool shotFired;
 
+    GameObject projectilePrefab;
     private void Awake()
     {
-        Transform launchPointTransf = transform.Find("LaunchPoint");
-        launchPoint = launchPointTransf.gameObject;
+        Transform launchPointTransf = launchPoint.transform;
+        //launchPoint = launchPointTransf.gameObject;
         launchPoint.SetActive(false);
         launchPos = launchPointTransf.position;
 
@@ -55,13 +58,20 @@ public class SlingshotScript : MonoBehaviour
             Instantiate<GameObject>(projLinePrefab, projectile.transform);
             projectile = null;
             MissionDemolition.ShotFired();
+            shotFired = true;
         }
-
+        
+        //if((projectilePrefab.GetComponent<ProjectileScript>() != null))
+        //{
+        //    Debug.Log("There is a script here !");
+        //    MissionDemolition.Projectiles.RemoveAt(MissionDemolition.Projectiles.Count -1);
+        //}
     }
     private void OnMouseEnter()
     {
         print("ShlingShot : OnMouse Enter");
         launchPoint.SetActive(true);
+        //CameraFollowScript.SWITCH_VIEW(CameraFollowScript.eView.both);
 
     }
     private void OnMouseExit()
@@ -73,8 +83,15 @@ public class SlingshotScript : MonoBehaviour
     private void OnMouseDown()
     {
         aimingMode = true;
+        int numOfProj = MissionDemolition.Projectiles.Count-1;
+        Debug.Log("Num of projec in sling : " + (numOfProj +1));
+        projectilePrefab = MissionDemolition.Projectiles[numOfProj];
+        //MissionDemolition.Projectiles.RemoveAt(numOfProj);
         projectile = Instantiate(projectilePrefab) as GameObject;
         projectile.transform.position = launchPos;
         projectile.GetComponent<Rigidbody>().isKinematic = true;
+        MissionDemolition.Projectiles[numOfProj].gameObject.SetActive(false);
+        shotFired = false;
+        MissionDemolition.Projectiles.RemoveAt(numOfProj);
     }
 }

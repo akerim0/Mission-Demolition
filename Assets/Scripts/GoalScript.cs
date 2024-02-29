@@ -15,7 +15,7 @@ public class GoalScript : MonoBehaviour
         {
             GoalScript.goalMet = true;
             Material mat = GetComponent<Renderer>().material;
-            Color c = mat.color;
+            Color c = Color.green;
             c.a = 0.75f;
             mat.color = c;
 
