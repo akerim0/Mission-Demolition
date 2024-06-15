@@ -10,7 +10,9 @@ public class ProjectileScript : MonoBehaviour
 
     [SerializeField]
     private bool _awake = true;
-
+    private AudioSource audioS;
+    public AudioClip wallHitAudio;
+    bool audioPlayed = false;
     //GameMode mode;
     public bool awake
     {
@@ -26,6 +28,7 @@ public class ProjectileScript : MonoBehaviour
     private void Start()
     {
         rigid = GetComponent<Rigidbody>();
+        audioS = GetComponent<AudioSource>();
         awake = true;
         prevpos = new Vector3(1000, 1000, 0);
         deltas.Add(1000);
@@ -58,6 +61,15 @@ public class ProjectileScript : MonoBehaviour
         if ((MissionDemolition.Projectiles.Count < 1) && !GoalScript.goalMet && rigid.IsSleeping())
         {
             MissionDemolition.mode = GameMode.gameOver;
+        }
+    }
+
+    private void OnCollisionEnter(UnityEngine.Collision collision)
+    {
+        if(collision.transform.tag == "wall" && !audioPlayed)
+        {
+            audioS.PlayOneShot(wallHitAudio);
+            audioPlayed = true;
         }
     }
     private void OnDestroy()

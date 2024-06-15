@@ -32,6 +32,13 @@ public class MissionDemolition : MonoBehaviour
     public GameObject GameOverText;
     public int startNumOfBalls = 3;
 
+    [Header("Audio")]
+    public AudioClip levelStarted;
+    public AudioClip gameOver;
+    bool gOsoundPlayed;
+    private AudioSource audioSource;
+
+
     [Header("Dynamic")]
     public int level;
     public int levelMax;
@@ -46,11 +53,7 @@ public class MissionDemolition : MonoBehaviour
         GameOverText.SetActive(false);
         projectilesParent = GameObject.Find("ProjectilesParent").transform;
         PROJ_LEVEL_DICT = new Dictionary<int, int>();
-        for(int i = 0; i<castles.Length; i++)
-        {
-            PROJ_LEVEL_DICT.Add(i,startNumOfBalls);
-            startNumOfBalls += 2;
-        }
+        audioSource = GetComponent<AudioSource>();
     }
     // Start is called before the first frame update
     void Start()
@@ -58,6 +61,11 @@ public class MissionDemolition : MonoBehaviour
         S = this;
         level = 0;
         levelMax = castles.Length;
+        for (int i = 0; i < castles.Length; i++)
+        {
+            PROJ_LEVEL_DICT.Add(i, startNumOfBalls);
+            startNumOfBalls += 2;
+        }
         StartLevel();
     }
 
@@ -92,6 +100,8 @@ public class MissionDemolition : MonoBehaviour
             projPos.x -= go.GetComponent<SphereCollider>().radius*2.5f;
             Projectiles.Add(go);
         }
+        audioSource.PlayOneShot(levelStarted);
+        gOsoundPlayed = false;
     }
 
     void UpdateGUI()
@@ -114,6 +124,11 @@ public class MissionDemolition : MonoBehaviour
         if (mode == GameMode.gameOver && shotsTaken == PROJ_LEVEL_DICT[level])
         {
             GameOverText.SetActive(true);
+            if (!gOsoundPlayed) {
+                audioSource.PlayOneShot(gameOver);
+                gOsoundPlayed = true;
+            }
+            
         }
         if (Input.GetKey(KeyCode.Escape)) QuitGame();
     }

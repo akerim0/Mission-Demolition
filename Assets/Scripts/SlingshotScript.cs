@@ -10,16 +10,23 @@ public class SlingshotScript : MonoBehaviour
     public GameObject projLinePrefab;
     public GameObject launchPoint;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip shotFiredAudio;
+    public AudioClip aimingAudio;
+
     [Header("Dynamic")]
     public Vector3 launchPos;
     public GameObject projectile;
     public bool aimingMode;
     public GameObject[] Projectiles;
     bool shotFired;
+    bool isAimingAudioPlayed;
 
     GameObject projectilePrefab;
     private void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
         Transform launchPointTransf = launchPoint.transform;
         //launchPoint = launchPointTransf.gameObject;
         launchPoint.SetActive(false);
@@ -41,9 +48,18 @@ public class SlingshotScript : MonoBehaviour
         if (mouseDelta.magnitude > maxMagnitude){
             mouseDelta.Normalize();
             mouseDelta *= maxMagnitude;
+                      
+        }
+        if (mouseDelta.magnitude > maxMagnitude/3)
+        {
+            if (!audioSource.isPlaying && !isAimingAudioPlayed)
+            {
+                audioSource.PlayOneShot(aimingAudio);
+                isAimingAudioPlayed = true;
+            }
         }
 
-        Vector3 projPos = launchPos + mouseDelta;
+            Vector3 projPos = launchPos + mouseDelta;
         projectile.transform.position = projPos;
 
         if (Input.GetMouseButtonUp(0))
@@ -59,6 +75,7 @@ public class SlingshotScript : MonoBehaviour
             projectile = null;
             MissionDemolition.ShotFired();
             shotFired = true;
+            audioSource.PlayOneShot(shotFiredAudio);
         }
         
         //if((projectilePrefab.GetComponent<ProjectileScript>() != null))
@@ -93,5 +110,6 @@ public class SlingshotScript : MonoBehaviour
         MissionDemolition.Projectiles[numOfProj].gameObject.SetActive(false);
         shotFired = false;
         MissionDemolition.Projectiles.RemoveAt(numOfProj);
+        isAimingAudioPlayed = false;
     }
 }
